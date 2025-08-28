@@ -5,7 +5,7 @@ ext {
     //GITHUB_REPO_PATH = 'D:\\AndroidStudioProjects\\OctopusFrameworkLibs'
     PUBLISH_GROUP_ID = 'com.zhuchao.android'
     PUBLISH_ARTIFACT_ID = 'libSessionUtils'
-    PUBLISH_VERSION = '2.9.2' //v2.7 stable
+    PUBLISH_VERSION = '2.9.3' //v2.7 stable
 }
 
 afterEvaluate {

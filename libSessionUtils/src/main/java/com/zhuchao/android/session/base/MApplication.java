@@ -1,4 +1,4 @@
-package com.zhuchao.android.session;
+package com.zhuchao.android.session.base;
 
 import android.app.Application;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.view.WindowManager;
 
 import com.zhuchao.android.fbase.MMLog;
 import com.zhuchao.android.fbase.TAppProcessUtils;
+import com.zhuchao.android.session.Cabinet;
+import com.zhuchao.android.session.GlobalBroadcastReceiver;
 
 public class MApplication extends Application {
     private static final String TAG = "MApplication";

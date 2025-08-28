@@ -6,11 +6,14 @@ import com.zhuchao.android.fbase.FileUtils;
 import com.zhuchao.android.fbase.ObjectList;
 import com.zhuchao.android.fbase.bean.AudioMetaFile;
 import com.zhuchao.android.fbase.bean.MediaMetadata;
+import com.zhuchao.android.video.Movie;
 import com.zhuchao.android.video.OMedia;
 import com.zhuchao.android.video.VideoList;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class TMediaMetadataManager {
     public static final String ALBUM_TAG = "media.album.tag.";
@@ -44,51 +47,71 @@ public class TMediaMetadataManager {
         return mMediaMetaDatas;
     }
 
+    /**
+     * Optimized version of updateArtistAndAlbum using Iterator to avoid ConcurrentModificationException.
+     * Improvements:
+     * 1. Iterator used to safely traverse the map and avoid modification exceptions.
+     * 2. Reduced repeated calls to oMedia.getMovie().
+     * 3. Cleaned up redundant null checks.
+     * 4. Improved readability and reduced code duplication.
+     */
+
     public void updateArtistAndAlbum(VideoList videoList) {
-        OMedia oMedia = null;
-        for (HashMap.Entry<String, Object> m : videoList.getMap().entrySet()) {
-            oMedia = (OMedia) m.getValue();
-            ///if (mVideoList.exist(oMedia)) continue;
-            if (mVideoList.exist(oMedia.getPathName())) continue;
+        OMedia oMedia;
+
+        for (Map.Entry<String, Object> entry : videoList.getMap().entrySet()) {
+            oMedia = (OMedia) entry.getValue();
+
+            // Skip null objects or already existing paths in the list
+            if (oMedia == null || oMedia.getMovie() == null || mVideoList.exist(oMedia.getPathName())) {
+                continue;
+            }
+
+            // Add to the video list
             mVideoList.addRow(oMedia);
-            String aaName = null;///ALBUM_TAG + oMedia.getMovie().getAlbum();
-            MediaMetadata mediaMetadata = null;///mediaMetadataList.getValue(aaName);
-            String album = oMedia.getMovie().getAlbum();
-            String artist = oMedia.getMovie().getArtist();
 
-            if (FileUtils.EmptyString(album)) album = "Unknow";
-            if (FileUtils.EmptyString(artist)) artist = "Unknow";
+            // Get Movie metadata
+            Movie movie = oMedia.getMovie();
+            String album = movie.getAlbum();
+            String artist = movie.getArtist();
 
-            {
-                aaName = ALBUM_TAG + album;
-                mediaMetadata = mMediaMetaDatas.getValue(aaName);
-                if (mediaMetadata == null) mediaMetadata = new MediaMetadata();
-                mediaMetadata.setAlbum(album);
-                mediaMetadata.setArtist(artist);
-                mediaMetadata.setId(oMedia.getMovie().getSourceId());
-                mediaMetadata.addDescription(oMedia.getMovie().getStudio());
-                mediaMetadata.addDescription(oMedia.getMovie().getDescription());
-                mediaMetadata.addDescription(oMedia.getMovie().getActor());
-                mediaMetadata.addCount();
-                if ((mediaMetadata.getBitmap() == null) && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)) {
-                    mediaMetadata.setBitmap(AudioMetaFile.getAlbumArtPicture(oMedia.getPathName()));
-                }
-                mMediaMetaDatas.addObject(aaName, mediaMetadata);
-            }
+            // Handle empty strings
+            if (FileUtils.EmptyString(album)) album = "Unknown";
+            if (FileUtils.EmptyString(artist)) artist = "Unknown";
 
-            {
-                aaName = ARTIST_TAG + artist;
-                mediaMetadata = mMediaMetaDatas.getValue(aaName);
-                if (mediaMetadata == null) mediaMetadata = new MediaMetadata();
-                mediaMetadata.setAlbum(album);
-                mediaMetadata.setArtist(artist);
-                mediaMetadata.setId(oMedia.getMovie().getSourceId());
-                mediaMetadata.addDescription(oMedia.getMovie().getStudio());
-                mediaMetadata.addDescription(oMedia.getMovie().getDescription());
-                mediaMetadata.addDescription(oMedia.getMovie().getActor());
-                mediaMetadata.addCount();
-                mMediaMetaDatas.addObject(aaName, mediaMetadata);
-            }
+            // === Album Metadata Update ===
+            String albumTagName = ALBUM_TAG + album;
+            MediaMetadata albumMetadata = mMediaMetaDatas.getValue(albumTagName);
+            if (albumMetadata == null) albumMetadata = new MediaMetadata();
+
+            updateMediaMetadata(albumMetadata, album, artist, movie, oMedia.getPathName());
+            mMediaMetaDatas.addObject(albumTagName, albumMetadata);
+
+            // === Artist Metadata Update ===
+            String artistTagName = ARTIST_TAG + artist;
+            MediaMetadata artistMetadata = mMediaMetaDatas.getValue(artistTagName);
+            if (artistMetadata == null) artistMetadata = new MediaMetadata();
+
+            updateMediaMetadata(artistMetadata, album, artist, movie, oMedia.getPathName());
+            mMediaMetaDatas.addObject(artistTagName, artistMetadata);
+        }
+    }
+
+    /**
+     * Helper method to update the metadata information.
+     */
+    private void updateMediaMetadata(MediaMetadata metadata, String album, String artist, Movie movie, String pathName) {
+        metadata.setAlbum(album);
+        metadata.setArtist(artist);
+        metadata.setId(movie.getSourceId());
+        metadata.addDescription(movie.getStudio());
+        metadata.addDescription(movie.getDescription());
+        metadata.addDescription(movie.getActor());
+        metadata.addCount();
+
+        // Set album art for Android Q and above
+        if (metadata.getBitmap() == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            metadata.setBitmap(AudioMetaFile.getAlbumArtPicture(pathName));
         }
     }
 

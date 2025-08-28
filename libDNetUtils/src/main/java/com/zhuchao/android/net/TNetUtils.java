@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioAttributes;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -320,6 +321,35 @@ public class TNetUtils extends ConnectivityManager.NetworkCallback {
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
     }
 
+    public int getCurrentWifiChannel(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (wifiManager == null) {
+            return -1;
+        }
+
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo == null || wifiInfo.getNetworkId() == -1) {
+            // 未连接任何 Wi-Fi
+            return -1;
+        }
+
+        int frequency = wifiInfo.getFrequency(); // 单位 MHz
+        return convertFrequencyToChannel(frequency);
+    }
+
+    private int convertFrequencyToChannel(int frequency) {
+        if (frequency >= 2412 && frequency <= 2472) {
+            return (frequency - 2407) / 5; // 2.4 GHz
+        } else if (frequency == 2484) {
+            return 14;
+        } else if (frequency >= 5180 && frequency <= 5825) {
+            return (frequency - 5000) / 5; // 5 GHz
+        } else {
+            return -1; // 非法频率
+        }
+    }
+
     public synchronized static boolean pingInternet(String ip) {
         try {
             //String ip = "www.baidu.com";
@@ -416,7 +446,7 @@ public class TNetUtils extends ConnectivityManager.NetworkCallback {
         return fileData.toString();
     }
 
-    // 从系统文件中获取WIFI MAC地址
+// 从系统文件中获取WIFI MAC地址
 
     @SuppressLint("HardwareIds")
     public String getWiFiMacAddress() {

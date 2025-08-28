@@ -45,6 +45,7 @@ import com.zhuchao.android.fbase.eventinterface.TCourierEventBusInterface;
 import com.zhuchao.android.net.TNetUtils;
 import com.zhuchao.android.persist.TPersistent;
 import com.zhuchao.android.serialport.TUartFile;
+import com.zhuchao.android.session.base.MApplication;
 
 import org.jetbrains.annotations.NotNull;
 

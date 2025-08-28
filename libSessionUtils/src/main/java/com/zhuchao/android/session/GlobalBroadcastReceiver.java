@@ -97,17 +97,17 @@ public class GlobalBroadcastReceiver extends BroadcastReceiver {
                 intent1.setComponent(new ComponentName(MESSAGE_EVENT_AIDL_PACKAGE_NAME, MESSAGE_EVENT_AIDL_CANBOX_CLASS_NAME));
                 context.startService(intent1);
 
-                Intent intent2 = new Intent();
-                intent2.setComponent(new ComponentName(MESSAGE_EVENT_AIDL_PACKAGE_NAME, MESSAGE_EVENT_AIDL_MUSIC_CLASS_NAME));
-                context.startService(intent2);
+                ///Intent intent2 = new Intent();
+                ///intent2.setComponent(new ComponentName(MESSAGE_EVENT_AIDL_PACKAGE_NAME, MESSAGE_EVENT_AIDL_MUSIC_CLASS_NAME));
+                ///context.startService(intent2);
 
                 ///Intent intent3 = new Intent();
                 ///intent3.setComponent(new ComponentName(MESSAGE_EVENT_AIDL_PACKAGE_NAME, MESSAGE_EVENT_AIDL_RECORDER_CLASS_NAME));
                 ///context.startService(intent3);
 
-                Intent intent4 = new Intent();
-                intent4.setComponent(new ComponentName(MESSAGE_EVENT_AIDL_PACKAGE_NAME, MESSAGE_EVENT_AIDL_NOTICE_CENTER_CLASS_NAME));
-                context.startService(intent4);
+                ///Intent intent4 = new Intent();
+                ///intent4.setComponent(new ComponentName(MESSAGE_EVENT_AIDL_PACKAGE_NAME, MESSAGE_EVENT_AIDL_NOTICE_CENTER_CLASS_NAME));
+                ///context.startService(intent4);
                 break;
             case MessageEvent.MESSAGE_EVENT_OCTOPUS_ACTION_HELLO:
                 MMLog.add(null);
