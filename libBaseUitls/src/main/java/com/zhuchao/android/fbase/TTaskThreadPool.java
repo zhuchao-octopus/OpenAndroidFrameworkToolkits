@@ -6,15 +6,17 @@ import static com.zhuchao.android.fbase.FileUtils.MD5;
 import com.zhuchao.android.fbase.eventinterface.TaskCallback;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TTaskThreadPool extends ObjectList implements TaskCallback {
     private final String TAG = "TaskThreadPool";
-    private int maxThreadCount = 20000;
+    private int maxThreadCount = 200;
     private final int minThreadCount = 1;
-    private int taskCounter = 0;
-    //private List<PTask> pTaskList_Ok = null;
+    private AtomicInteger taskCounter = new AtomicInteger(0);
+    ///private List<PTask> pTaskList_Ok = null;
     private final String ANONYMOUS_NAME = "anonymous-default";
-    //private boolean autoFreeRemove = false;
+    ///private boolean autoFreeRemove = false;
+    ///private final BlockingQueue<TTask> taskQueue = new LinkedBlockingQueue<>();
 
     public TTaskThreadPool() {
         super();
@@ -24,14 +26,6 @@ public class TTaskThreadPool extends ObjectList implements TaskCallback {
         super();
         this.maxThreadCount = maxThreadCount;
     }
-
-    //public boolean isAutoFreeRemove() {
-    //    return autoFreeRemove;
-    //}
-
-    //public void setAutoRemove(boolean autoRemove) {
-    //    this.autoFreeRemove = autoRemove;
-    //}
 
     public PTask createTask() {
         return createTask("");
@@ -60,11 +54,7 @@ public class TTaskThreadPool extends ObjectList implements TaskCallback {
     }
 
     private int getTaskCounter() {
-        return taskCounter;
-    }
-
-    private void setTaskCounter(int taskCounter) {
-        this.taskCounter = taskCounter;
+        return taskCounter.get();
     }
 
     public TTask getTaskByName(String tName) {
@@ -98,6 +88,71 @@ public class TTaskThreadPool extends ObjectList implements TaskCallback {
             return true;
         }
         return false;
+    }
+
+    public TTask getIdleTask() {
+        Collection<Object> objects = getAllObject();
+        for (Object o : objects) {
+            TTask tTask = ((TTask) o);
+            if (!tTask.isBusy()) return tTask;
+        }
+        return null;
+    }
+
+    public TTask getIdleTaskLock() {
+        Collection<Object> objects = getAllObject();
+        for (Object o : objects) {
+            TTask tTask = ((TTask) o);
+            if (!tTask.isBusy()) {
+                tTask.lock();
+                return tTask;
+            }
+        }
+        return null;
+    }
+
+    public TTask getNewTask(String tName) {
+        if (getTaskByName(tName) != null)
+            return createTask(tName + System.currentTimeMillis());
+        else
+            return createTask(tName);
+    }
+
+    public TTask getAvailableTask(String tName) {
+        TTask tTask = getIdleTask();
+        if (tTask != null) {
+            tTask.resetAll();
+            return tTask;
+        } else return getNewTask(tName);
+    }
+
+    public TTask getAvailableTaskLock(String tName) {
+        TTask tTask = getIdleTaskLock();
+        if (tTask != null) {
+            tTask.resetAll();
+        } else {
+            tTask = getNewTask(tName);
+            tTask.lock();
+        }
+        return tTask;
+    }
+
+    public synchronized TTask getSingleTaskFor(String tName) {
+        TTask tTask = getTaskByName(tName);
+        if (tTask == null) {
+            return createTask(tName);
+        }
+        return tTask;
+    }
+
+    public synchronized TTask getSingleTaskLock(String tName) {//主题任务是个异步任务，需要等待
+        TTask tTask = getTaskByName(tName);
+        if (tTask == null) {
+            tTask = createTask(tName);
+        }
+        if (tTask.isBusy()) return tTask;//无法锁定
+        tTask.lock();//主题任务是个异步任务，需要等待
+        return tTask;
     }
 
     public void deleteTaskInterface(TTaskInterface tTask) {
@@ -137,8 +192,6 @@ public class TTaskThreadPool extends ObjectList implements TaskCallback {
     public void onEventTaskFinished(Object obj, int status) {
         TTask tTask = ((TTask) obj);
         if (existObject(tTask.tTag)) {
-
-            setTaskCounter(getTaskCounter() + 1);
             MMLog.log(TAG, "pTask finished tTag = " + tTask.tTag + ",total:" + getCount() + ",completed:" + taskCounter);
 
             if (getTaskCounter() == getCount()) {
@@ -146,12 +199,14 @@ public class TTaskThreadPool extends ObjectList implements TaskCallback {
                     tTask.getCallBackHandler().onEventTaskFinished(this, DataID.TASK_STATUS_FINISHED_ALL);//池中所有任务完成
                 }
             }
+
             if (tTask.getTaskName().contains(ANONYMOUS_NAME)) {
                 MMLog.log(TAG, "free anonymous task name = " + tTask.getTaskName());
                 //free();//自动清除匿名线程
                 tTask.freeFree();
                 deleteTask(tTask);
             }
+
         } else {
             MMLog.log(TAG, "onEventTask No PTask object in pool,tag = " + tTask.tTag);
         }
@@ -178,7 +233,7 @@ public class TTaskThreadPool extends ObjectList implements TaskCallback {
                 //MMLog.log(TAG, "PTask complete successfully,remove from task pool tag = " + tTag);
                 */
                 //isKeeping == false 后到这里
-                setTaskCounter(getTaskCounter() + 1);//完成的任务计数
+                taskCounter.incrementAndGet();//完成的任务计数
 
                 if (getTaskCounter() == getCount()) {
                     doCallBackHandle(DataID.TASK_STATUS_FINISHED_ALL);////池中所有任务完成
@@ -200,8 +255,8 @@ public class TTaskThreadPool extends ObjectList implements TaskCallback {
                 MMLog.log(TAG, "not found PTask object in pool,break tag = " + tTag);
             }
         }
+    }// class PTask extends TTask implements TaskCallback {
 
-    }
 }
 
 
