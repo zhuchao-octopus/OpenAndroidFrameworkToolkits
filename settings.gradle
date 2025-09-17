@@ -8,7 +8,7 @@ include ':libOpenComputerVision'
 include ':libOpenDetection'
 include ':libOpenC-CNN'
 include ':libOpenLargeModelDeepLearning'
-
+include ':libIPCOTMS'
 
 include ':libGXMediaUtils'
 include ':libGXPlayerUtils'

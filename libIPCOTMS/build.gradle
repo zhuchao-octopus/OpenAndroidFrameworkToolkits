@@ -1,0 +1,76 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+
+ext {
+    //GITHUB_REPO_PATH = 'D:\\AndroidStudioProjects\\OctopusFrameworkLibs'
+    PUBLISH_GROUP_ID = 'com.zhuchao.android'
+    PUBLISH_ARTIFACT_ID = 'libIPCOTMS'
+    PUBLISH_VERSION = '1.0.0'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version PUBLISH_VERSION
+            }
+        }
+        repositories {
+            maven {
+                allowInsecureProtocol true
+                url GITHUB_REPO_REMOTE_PATH
+            }
+            maven {
+                allowInsecureProtocol true
+                url GITHUB_REPO_LOCAL_PATH // 第二个仓库地址
+            }
+        }
+    }
+}
+
+android {
+    compileSdk 34
+    defaultConfig {
+        minSdk 24
+        targetSdk 34
+    }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            //withJavadocJar()
+        }
+    }
+    publishing {
+        multipleVariants {
+            withSourcesJar()
+            //withJavadocJar()
+            allVariants()
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path 'CMakeLists.txt'
+        }
+    }
+    namespace 'com.zhuchao.android.ipc_otms'
+}
+
+dependencies {
+    implementation(platform('org.jetbrains.kotlin:kotlin-bom:2.0.0'))
+    api('androidx.core:core:1.12.0')
+    api('androidx.appcompat:appcompat:1.6.1')
+    api('androidx.annotation:annotation:1.7.0-alpha02')
+    api('androidx.exifinterface:exifinterface:1.3.6')
+    api('androidx.documentfile:documentfile:1.0.1')
+}
