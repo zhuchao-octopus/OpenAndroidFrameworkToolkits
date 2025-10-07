@@ -34,10 +34,10 @@ afterEvaluate {
 }
 
 android {
-    compileSdk 34
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
     }
 
     buildTypes {
@@ -45,20 +45,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-
-    //compileOptions {
-    //        sourceCompatibility JavaVersion.VERSION 17
-    //        targetCompatibility JavaVersion.VERSION 17
-    //}
-
-    ///kotlinOptions {
-    ///    jvmTarget = '17'
-    ///}
-
-    kotlin {
-        // For example:
-        jvmToolchain(17)
     }
 
     namespace 'com.zhuchao.android.persist'

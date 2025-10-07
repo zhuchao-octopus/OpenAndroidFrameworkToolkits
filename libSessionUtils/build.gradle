@@ -33,10 +33,11 @@ afterEvaluate {
 
 android {
     namespace 'com.zhuchao.android.session'
-    compileSdk 34
+
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
     }
 
     publishing {
@@ -86,8 +87,8 @@ android {
 }
 
 dependencies {
-    implementation('androidx.appcompat:appcompat:1.6.1')
-    implementation('androidx.media:media:1.6.0')
+    implementation('androidx.appcompat:appcompat:1.7.1')
+    implementation('androidx.media:media:1.7.1')
 
     implementation project(path: ':libBaseUitls')
     implementation project(path: ':libFOSUtils')

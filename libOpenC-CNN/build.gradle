@@ -35,10 +35,10 @@ afterEvaluate {
 
 android {
     namespace 'com.zhuchao.android.libc_cnn'
-    compileSdk 34
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
 
         externalNativeBuild {
             cmake {
@@ -77,12 +77,11 @@ android {
             path 'CMakeLists.txt'
         }
     }
+
+    ndkVersion '29.0.14206865'  // 指定你本地安装的 NDK 版本
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.13.0'
 }

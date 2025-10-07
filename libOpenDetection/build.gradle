@@ -14,6 +14,7 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
+                //artifact("$buildDir/outputs/aar/libOpenDetection-release.aar")
                 groupId PUBLISH_GROUP_ID
                 artifactId PUBLISH_ARTIFACT_ID
                 version PUBLISH_VERSION
@@ -34,10 +35,11 @@ afterEvaluate {
 
 android {
     namespace 'com.zhuchao.android.libOpenDetection'
-    compileSdk 34
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
+
         externalNativeBuild {
             cmake {
                 arguments "-DOpenCV_DIR=" + project(':libOpenComputerVision').projectDir + "/native/jni",
@@ -82,11 +84,13 @@ dependencies {
     implementation project(path: ':libBaseUitls')
     implementation project(path: ':libOpenComputerVision')
 
-    implementation 'androidx.annotation:annotation:1.7.0-alpha02'
-    implementation 'androidx.exifinterface:exifinterface:1.3.6'
+    implementation 'androidx.annotation:annotation:1.9.1'
+    implementation 'androidx.exifinterface:exifinterface:1.4.1'
 
-    implementation 'org.tensorflow:tensorflow-lite:2.16.1'
-    implementation 'org.tensorflow:tensorflow-lite-gpu:2.16.1' // Optional for GPU acceleration
+    //noinspection Aligned16KB,Aligned16KB
+    implementation 'org.tensorflow:tensorflow-lite:2.17.0'
+    //noinspection Aligned16KB,Aligned16KB,Aligned16KB,Aligned16KB
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.17.0' // Optional for GPU acceleration
 
     ///implementation group: 'org.bytedeco', name: 'javacv-platform', version: '1.5.8'
     ///implementation group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '4.0.1-1.4.4', classifier: 'android-arm'

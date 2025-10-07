@@ -524,7 +524,7 @@ public class MPlayer extends PlayControl implements MediaPlayer.OnCompletionList
     }
 
     @Override
-    public void stopRecording() {
+    public void stopRecording(String filePath) {
 
     }
 

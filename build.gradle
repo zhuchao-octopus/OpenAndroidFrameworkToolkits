@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.6.0'
+        classpath 'com.android.tools.build:gradle:8.13.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
         //classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         //classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
@@ -31,5 +31,22 @@ tasks.register('clean', Delete) {
 
 ext {
     GITHUB_REPO_REMOTE_PATH = "\\\\192.168.10.254\\smb\\OctopusFrameworkLibs"
-    GITHUB_REPO_LOCAL_PATH = "\\\\DESKTOP-7HI3PEQ\\OctopusFrameworkLibs"
+    //GITHUB_REPO_LOCAL_PATH = "\\\\DESKTOP-7HI3PEQ\\OctopusFrameworkLibs"
+    GITHUB_REPO_LOCAL_PATH = "E:\\\\Android-Projects\\\\OctopusAndroidFrameworkLibs"
+}
+
+ext {
+    sdk_version = [
+            compile : 36,   // compileSdkVersion
+            target  : 35,   // targetSdkVersion
+            min     : 25    // minSdkVersion
+    ]
+}
+
+ext {
+    ANDROID_STL_TYPE = "c++_static"
+}
+
+gradle.taskGraph.whenReady {
+    println "✅ Using SDK Versions -> compile: ${sdk_version.compile}, target: ${sdk_version.target}, min: ${sdk_version.min}"
 }

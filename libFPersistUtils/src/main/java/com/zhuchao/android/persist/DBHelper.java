@@ -49,154 +49,160 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     public ArrayList<String> selectAllData(String tableName) {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         Cursor cursor = db.query(tableName, null, null, null, null, null, null);
 
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
-            String name = cursor.getString(cursor.getColumnIndex("name"));
-            String p1 = cursor.getString(cursor.getColumnIndex("p1"));
-            String p2 = cursor.getString(cursor.getColumnIndex("p2"));
-            String p3 = cursor.getString(cursor.getColumnIndex("p3"));
-            String p4 = cursor.getString(cursor.getColumnIndex("p4"));
-            String p5 = cursor.getString(cursor.getColumnIndex("p5"));
-            String p6 = cursor.getString(cursor.getColumnIndex("p6"));
-            String p7 = cursor.getString(cursor.getColumnIndex("p7"));
-            String p8 = cursor.getString(cursor.getColumnIndex("p8"));
-            String p9 = cursor.getString(cursor.getColumnIndex("p9"));
-            String p10 = cursor.getString(cursor.getColumnIndex("p10"));
-            String p11 = cursor.getString(cursor.getColumnIndex("p11"));
-            String p12 = cursor.getString(cursor.getColumnIndex("p12"));
-            String p13 = cursor.getString(cursor.getColumnIndex("p13"));
-            String p14 = cursor.getString(cursor.getColumnIndex("p14"));
-
-            list.add(String.valueOf(id) + ',' + name + ',' + p1 + ',' + p2 + ',' + p3 + ',' + p4 + ',' + p5 + ',' + p6 + ',' + p7 + ',' + p8 + ',' + p9 + ',' + p10 + ',' + p11 + ',' + p12 + ',' + p13 + ',' + p14);
-            //MLog("--Main--", "selectis=========" + id + "==" + name + "==" + mon + "==" + address + "==" + number);
-        }
         if (cursor != null) {
+            // 先获取列索引
+            int idIndex = cursor.getColumnIndex("id");
+            int nameIndex = cursor.getColumnIndex("name");
+            int[] pIndexes = new int[14];
+            for (int i = 0; i < 14; i++) {
+                pIndexes[i] = cursor.getColumnIndex("p" + (i + 1));
+            }
+
+            while (cursor.moveToNext()) {
+                int id = (idIndex != -1) ? cursor.getInt(idIndex) : -1;
+                String name = (nameIndex != -1) ? cursor.getString(nameIndex) : "";
+
+                String[] pValues = new String[14];
+                for (int i = 0; i < 14; i++) {
+                    pValues[i] = (pIndexes[i] != -1) ? cursor.getString(pIndexes[i]) : "";
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(id).append(',').append(name);
+                for (String p : pValues) {
+                    sb.append(',').append(p);
+                }
+
+                list.add(sb.toString());
+            }
             cursor.close();
         }
+
         return list;
     }
 
     public ArrayList<String> selectData(String tableName, String name) {
-        ArrayList<String> list = new ArrayList<String>();
-        //Cursor cursor = db.query("CommonDB", null, null, null, null, null, null);
+        ArrayList<String> list = new ArrayList<>();
         Cursor cursor = db.query(tableName, null, "name = ?", new String[]{name}, null, null, null);
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
-            String p1 = cursor.getString(cursor.getColumnIndex("p1"));
-            String p2 = cursor.getString(cursor.getColumnIndex("p2"));
-            String p3 = cursor.getString(cursor.getColumnIndex("p3"));
-            String p4 = cursor.getString(cursor.getColumnIndex("p4"));
-            String p5 = cursor.getString(cursor.getColumnIndex("p5"));
-            String p6 = cursor.getString(cursor.getColumnIndex("p6"));
-            String p7 = cursor.getString(cursor.getColumnIndex("p7"));
-            String p8 = cursor.getString(cursor.getColumnIndex("p8"));
-            String p9 = cursor.getString(cursor.getColumnIndex("p9"));
-            String p10 = cursor.getString(cursor.getColumnIndex("p10"));
-            String p11 = cursor.getString(cursor.getColumnIndex("p11"));
-            String p12 = cursor.getString(cursor.getColumnIndex("p12"));
-            String p13 = cursor.getString(cursor.getColumnIndex("p13"));
-            String p14 = cursor.getString(cursor.getColumnIndex("p14"));
-
-            list.add(String.valueOf(id) + ',' + name + ',' + p1 + ',' + p2 + ',' + p3 + ',' + p4 + ',' + p5 + ',' + p6 + ',' + p7 + ',' + p8 + ',' + p9 + ',' + p10 + ',' + p11 + ',' + p12 + ',' + p13 + ',' + p14);
-            //MLog("--Main--", "selectis=========" + id + "==" + name + "==" + mon + "==" + address + "==" + number);
-        }
 
         if (cursor != null) {
+            int idIndex = cursor.getColumnIndex("id");
+            int nameIndex = cursor.getColumnIndex("name");
+            int[] pIndexes = new int[14];
+            for (int i = 0; i < 14; i++) {
+                pIndexes[i] = cursor.getColumnIndex("p" + (i + 1));
+            }
+
+            while (cursor.moveToNext()) {
+                int id = (idIndex != -1) ? cursor.getInt(idIndex) : -1;
+                String nameStr = (nameIndex != -1) ? cursor.getString(nameIndex) : "";
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(id).append(',').append(nameStr);
+
+                for (int i = 0; i < 14; i++) {
+                    String p = (pIndexes[i] != -1) ? cursor.getString(pIndexes[i]) : "";
+                    sb.append(',').append(p);
+                }
+
+                list.add(sb.toString());
+            }
             cursor.close();
         }
+
         return list;
     }
 
     public ArrayList<String> selectData(String tableName, int Userid) {
-        ArrayList<String> list = new ArrayList<String>();
-        //Cursor cursor = db.query("CommonDB", null, null, null, null, null, null);
+        ArrayList<String> list = new ArrayList<>();
         Cursor cursor = db.query(tableName, null, "id = ?", new String[]{String.valueOf(Userid)}, null, null, null);
-        while (cursor.moveToNext()) {
-
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
-            String name = cursor.getString(cursor.getColumnIndex("name"));
-            String p1 = cursor.getString(cursor.getColumnIndex("p1"));
-            String p2 = cursor.getString(cursor.getColumnIndex("p2"));
-            String p3 = cursor.getString(cursor.getColumnIndex("p3"));
-            String p4 = cursor.getString(cursor.getColumnIndex("p4"));
-            String p5 = cursor.getString(cursor.getColumnIndex("p5"));
-            String p6 = cursor.getString(cursor.getColumnIndex("p6"));
-            String p7 = cursor.getString(cursor.getColumnIndex("p7"));
-            String p8 = cursor.getString(cursor.getColumnIndex("p8"));
-            String p9 = cursor.getString(cursor.getColumnIndex("p9"));
-            String p10 = cursor.getString(cursor.getColumnIndex("p10"));
-            String p11 = cursor.getString(cursor.getColumnIndex("p11"));
-            String p12 = cursor.getString(cursor.getColumnIndex("p12"));
-            String p13 = cursor.getString(cursor.getColumnIndex("p13"));
-            String p14 = cursor.getString(cursor.getColumnIndex("p14"));
-
-            list.add(String.valueOf(id) + ',' + name + ',' + p1 + ',' + p2 + ',' + p3 + ',' + p4 + ',' + p5 + ',' + p6 + ',' + p7 + ',' + p8 + ',' + p9 + ',' + p10 + ',' + p11 + ',' + p12 + ',' + p13 + ',' + p14);
-            //MLog("--Main--", "selectis=========" + id + "==" + name + "==" + mon + "==" + address + "==" + number);
-        }
 
         if (cursor != null) {
+            int idIndex = cursor.getColumnIndex("id");
+            int nameIndex = cursor.getColumnIndex("name");
+            int[] pIndexes = new int[14];
+            for (int i = 0; i < 14; i++) {
+                pIndexes[i] = cursor.getColumnIndex("p" + (i + 1));
+            }
+
+            while (cursor.moveToNext()) {
+                int id = (idIndex != -1) ? cursor.getInt(idIndex) : -1;
+                String name = (nameIndex != -1) ? cursor.getString(nameIndex) : "";
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(id).append(',').append(name);
+
+                for (int i = 0; i < 14; i++) {
+                    String p = (pIndexes[i] != -1) ? cursor.getString(pIndexes[i]) : "";
+                    sb.append(',').append(p);
+                }
+
+                list.add(sb.toString());
+            }
+
             cursor.close();
         }
+
         return list;
     }
 
     public ArrayList<String> selectDataNameP1(String tableName, String name, String p1) {
-        ArrayList<String> list = new ArrayList<String>();
-        //Cursor cursor = db.query("CommonDB", null, null, null, null, null, null);
+        ArrayList<String> list = new ArrayList<>();
         Cursor cursor = db.query(tableName, null, "name = ? and p1 = ?", new String[]{name, p1}, null, null, null);
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
-            //String name = cursor.getString(cursor.getColumnIndex("name"));
-            //String p1 = cursor.getString(cursor.getColumnIndex("p1"));
-            String p2 = cursor.getString(cursor.getColumnIndex("p2"));
-            String p3 = cursor.getString(cursor.getColumnIndex("p3"));
-            String p4 = cursor.getString(cursor.getColumnIndex("p4"));
-            String p5 = cursor.getString(cursor.getColumnIndex("p5"));
-            String p6 = cursor.getString(cursor.getColumnIndex("p6"));
-            String p7 = cursor.getString(cursor.getColumnIndex("p7"));
-            String p8 = cursor.getString(cursor.getColumnIndex("p8"));
-            String p9 = cursor.getString(cursor.getColumnIndex("p9"));
-            String p10 = cursor.getString(cursor.getColumnIndex("p10"));
-            String p11 = cursor.getString(cursor.getColumnIndex("p11"));
-            String p12 = cursor.getString(cursor.getColumnIndex("p12"));
-            String p13 = cursor.getString(cursor.getColumnIndex("p13"));
-            String p14 = cursor.getString(cursor.getColumnIndex("p14"));
-
-            list.add(String.valueOf(id) + ',' + name + ',' + p1 + ',' + p2 + ',' + p3 + ',' + p4 + ',' + p5 + ',' + p6 + ',' + p7 + ',' + p8 + ',' + p9 + ',' + p10 + ',' + p11 + ',' + p12 + ',' + p13 + ',' + p14);
-            //MLog("--Main--", "selectis=========" + id + "==" + name + "==" + mon + "==" + address + "==" + number);
-        }
 
         if (cursor != null) {
+            int idIndex = cursor.getColumnIndex("id");
+            int nameIndex = cursor.getColumnIndex("name");
+            int p1Index = cursor.getColumnIndex("p1");
+            int[] pIndexes = new int[13]; // p2~p14
+            for (int i = 0; i < 13; i++) {
+                pIndexes[i] = cursor.getColumnIndex("p" + (i + 2));
+            }
+
+            while (cursor.moveToNext()) {
+                int id = (idIndex != -1) ? cursor.getInt(idIndex) : -1;
+                String rowName = (nameIndex != -1) ? cursor.getString(nameIndex) : "";
+                String rowP1 = (p1Index != -1) ? cursor.getString(p1Index) : "";
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(id).append(',').append(rowName).append(',').append(rowP1);
+
+                for (int i = 0; i < 13; i++) {
+                    String p = (pIndexes[i] != -1) ? cursor.getString(pIndexes[i]) : "";
+                    sb.append(',').append(p);
+                }
+
+                list.add(sb.toString());
+            }
             cursor.close();
         }
 
         return list;
     }
-
 
     /**
      * 根据ID删除数据
      * id 删除id
      */
     public int delData(String tableName, int id) {
-        int inde = db.delete(tableName, "id = ?", new String[]{String.valueOf(id)});
-        //MLog("--Main--", "删除了==============" + inde);
-        return inde;
+        int index = db.delete(tableName, "id = ?", new String[]{String.valueOf(id)});
+        //MLog("--Main--", "删除了==============" + index);
+        return index;
     }
 
     public int delData(String tableName, String name) {
-        int inde = db.delete(tableName, "name = ?", new String[]{name});
-        MMLog.log("--Main--", "删除了==============" + inde);
-        return inde;
+        int index = db.delete(tableName, "name = ?", new String[]{name});
+        MMLog.log("--Main--", "删除了==============" + index);
+        return index;
     }
 
     public int delDataNameP1(String tableName, String name, String p1) {
-        int inde = db.delete(tableName, "name = ? and p1 = ?", new String[]{name, p1});
-        MMLog.log("--Main--", "删除了==============" + inde);
-        return inde;
+        int index = db.delete(tableName, "name = ? and p1 = ?", new String[]{name, p1});
+        MMLog.log("--Main--", "删除了==============" + index);
+        return index;
     }
 
     public int modifyData(int id, String tableName, String name, String p1, String p2, String p3, String p4, String p5, String p6, String p7, String p8, String p9, String p10, String p11, String p12, String p13, String p14) {
@@ -294,13 +300,17 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void updateData(String tableName, String name, String p1, String p2, String p3, String p4, String p5, String p6, String p7, String p8, String p9, String p10, String p11, String p12, String p13, String p14) {
-        if (existsData(tableName, name)) modifyData(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
-        else insertData(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+        if (existsData(tableName, name))
+            modifyData(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+        else
+            insertData(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
     }
 
     public void updateData2(String tableName, String name, String p1, String p2, String p3, String p4, String p5, String p6, String p7, String p8, String p9, String p10, String p11, String p12, String p13, String p14) {
-        if (existsDataNameP1(tableName, name, p1)) modifyDataByNameP1(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
-        else insertData(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+        if (existsDataNameP1(tableName, name, p1))
+            modifyDataByNameP1(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+        else
+            insertData(tableName, name, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
     }
 
     /*

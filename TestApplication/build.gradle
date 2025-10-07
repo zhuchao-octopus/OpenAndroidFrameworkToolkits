@@ -7,18 +7,16 @@ ext {
     ///PUBLISH_PLATFORM = 'rk3288'
     ///PUBLISH_PLATFORM = 'AW40I'
     PUBLISH_PLATFORM = 'AW507'
-    //GITHUB_REPO_PATH = 'D:\\AndroidStudioProjects\\OctopusFrameworkLibs'
     PUBLISH_GROUP_ID = 'com.zhuchao.android'
     PUBLISH_ARTIFACT_ID = 'wms'
 }
 
 android {
     namespace 'com.zhuchao.android.wms'
-
-    compileSdk 34
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
 
         versionCode 105
         versionName "1.06"
@@ -74,10 +72,10 @@ dependencies {
     implementation project(path: ':libCamera')
     implementation project(path: ':libOpenDetection')
 
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.13.0'
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     testImplementation 'junit:junit:4.13.2'
 }

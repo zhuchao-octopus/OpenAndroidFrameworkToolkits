@@ -648,14 +648,14 @@ public class OPlayer extends PlayControl implements View.OnLayoutChangeListener 
     @Override
     public void startRecording(String filePath) {
         if(mMediaPlayer != null)
-          mMediaPlayer.record(filePath);
+          mMediaPlayer.record(filePath,true);
     }
 
     @Override
-    public void stopRecording() {
+    public void stopRecording(String filePath) {
         if (mMediaPlayer == null)
             return;
-        mMediaPlayer.record(null);
+        mMediaPlayer.record(filePath,false);
     }
 
     public void setCallback(PlayerCallback callback) {

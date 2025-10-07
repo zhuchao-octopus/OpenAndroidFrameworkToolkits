@@ -41,10 +41,10 @@ afterEvaluate {
 }
 
 android {
-    compileSdk 34
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters /*"x86", */ "armeabi-v7a", "arm64-v8a" /*, "armeabi", "armabi-v7a", "x86_64", "mips", "mips64"*/

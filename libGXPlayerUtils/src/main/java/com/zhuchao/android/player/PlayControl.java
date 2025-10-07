@@ -133,7 +133,7 @@ public abstract class PlayControl {
 
     public abstract void startRecording(String filePath);
 
-    public abstract void stopRecording();
+    public abstract void stopRecording(String filePath);
 
     public PlayerStatusInfo getPlayerStatusInfo() {
         return playerStatusInfo;

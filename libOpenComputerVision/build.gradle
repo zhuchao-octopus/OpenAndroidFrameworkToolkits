@@ -127,16 +127,15 @@ afterEvaluate {
 
 android {
     namespace 'org.opencv'
-    compileSdk 34
-    defaultConfig {
-        minSdk 24
-        targetSdk 34
+    compileSdkVersion sdk_version.compile
 
+    defaultConfig {
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
 
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=c++_shared"
-                targets "opencv_jni_shared"
+                arguments "-DANDROID_STL=$ANDROID_STL_TYPE"
             }
         }
     }
@@ -148,16 +147,29 @@ android {
 
     buildTypes {
         debug {
+            // 只控制不剥离 so
             packagingOptions {
-                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
+                doNotStrip '**/*.so'
             }
         }
         release {
             packagingOptions {
-                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
+                doNotStrip '**/*.so'
             }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    // 全局处理 libc++_shared.so 冲突
+    packagingOptions {
+        jniLibs {
+            pickFirsts += [
+                    'lib/arm64-v8a/libc++_shared.so',
+                    'lib/armeabi-v7a/libc++_shared.so',
+                    'lib/x86/libc++_shared.so',
+                    'lib/x86_64/libc++_shared.so'
+            ]
         }
     }
 
@@ -180,20 +192,19 @@ android {
         }
     }
 
+    externalNativeBuild {
+        cmake {
+            path project.projectDir.toString() + '/libcxx_helper/CMakeLists.txt'
+        }
+    }
+
     publishing {
         singleVariant('release') {
             withSourcesJar()
             withJavadocJar()
         }
     }
-
-    externalNativeBuild {
-        cmake {
-            path (project.projectDir.toString() + '/libcxx_helper/CMakeLists.txt')
-        }
-    }
 }
-
 
 dependencies {
 }

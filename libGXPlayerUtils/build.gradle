@@ -41,13 +41,18 @@ afterEvaluate {
 }
 
 android {
-    compileSdk 34
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
         ndk {
             //noinspection ChromeOsAbiSupport
-            abiFilters /*"x86", */ "armeabi-v7a", "arm64-v8a" /*, "armeabi", "armabi-v7a", "x86_64", "mips", "mips64"*/
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=$ANDROID_STL_TYPE"
+            }
         }
     }
 
@@ -72,6 +77,16 @@ android {
         }
     }
 
+    packagingOptions {
+        jniLibs {
+            pickFirsts += [
+                    'lib/arm64-v8a/libc++_shared.so',
+                    'lib/armeabi-v7a/libc++_shared.so',
+                    'lib/x86/libc++_shared.so',
+                    'lib/x86_64/libc++_shared.so'
+            ]
+        }
+    }
     namespace 'com.zhuchao.android.player'
 
 }
@@ -81,15 +96,9 @@ dependencies {
     implementation project(path: ':libBaseUitls')
     implementation project(path: ':libDNetUtils')
     implementation project(path: ':libFOSUtils')
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
     ///compileOnly files('libs/libvlc-3.5.4-armeabi-v7a-release.aar')
-    compileOnly files('libs/libvlc-all-4.0.0-eap9.aar')
-
-    ///implementation 'org.videolan.android:libvlc-all:4.0.0-eap9'
-    ///compileOnly 'org.videolan.android:libvlc-all:3.5.0-eap8'
-    ///implementation 'org.videolan.android:libvlc-all:3.3.1'
-    ///implementation group: 'org.videolan.android', name: 'libvlc-all', version: '4.0.0-eap8'
-    ///implementation group: 'org.videolan.android', name: 'libvlc-all', version: '3.5.1'
     ///implementation project(path: ':libDecodeCore')
+    implementation group: 'org.videolan.android', name: 'libvlc-all', version: '4.0.0-eap23'
 }

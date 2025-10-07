@@ -33,17 +33,19 @@ afterEvaluate {
 }
 
 android {
-    compileSdk 34
+    compileSdkVersion sdk_version.compile
     defaultConfig {
-        minSdk 24
-        targetSdk 34
+        minSdk sdk_version.min
+        targetSdk sdk_version.target
     }
+
     publishing {
         singleVariant('release') {
             withSourcesJar()
             //withJavadocJar()
         }
     }
+
     publishing {
         multipleVariants {
             withSourcesJar()

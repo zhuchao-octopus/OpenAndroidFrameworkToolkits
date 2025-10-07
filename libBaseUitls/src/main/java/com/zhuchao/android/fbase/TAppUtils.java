@@ -381,6 +381,7 @@ public class TAppUtils {
         context.startActivity(intent);
     }
 
+    @SuppressLint("RequestInstallPackagesPolicy")
     public synchronized static boolean installSilent(Context context, String apkFilePathName) {
         boolean ret = false;
         File file = new File(apkFilePathName);
@@ -412,7 +413,7 @@ public class TAppUtils {
             Intent intent = new Intent();
             intent.setAction("android.intent.action.SILENT_INSTALL_PACKAGE_COMPLETE");
             intent.putExtra("apkFilePathName", apkFilePathName);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
             IntentSender intentSender = pendingIntent.getIntentSender();
             session.commit(intentSender);//提交启动安装
             //MMLog.log(TAG, "installed: "+apkPath);

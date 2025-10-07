@@ -4,8 +4,10 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -339,6 +341,16 @@ public class JavaCamera2View extends CameraBridgeViewBase {
             }
 
             Log.i(LOGTAG, "Opening camera: " + mCameraID);
+            if (checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    Activity#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for Activity#requestPermissions for more details.
+                return false;
+            }
             manager.openCamera(mCameraID, mStateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             Log.e(LOGTAG, "OpenCamera - Camera Access Exception", e);
@@ -348,7 +360,12 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         return true;
     }
 
-    private class JavaCamera2Frame implements CvCameraViewFrame {
+    private int checkSelfPermission() {
+        String permissionCamera = Manifest.permission.CAMERA;
+        return 1;
+    }
+
+    private static class JavaCamera2Frame implements CvCameraViewFrame {
         @Override
         public Mat gray() {
             Image.Plane[] planes = mImage.getPlanes();
