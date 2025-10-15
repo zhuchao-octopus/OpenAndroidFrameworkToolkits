@@ -1,0 +1,15 @@
+[Unit]
+Description=octopus Service
+Documentation=https://github.com/zhuchao-octopus/RPCService
+DefaultDependencies=no
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/octopus_ipc_server
+Restart=always
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
