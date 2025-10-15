@@ -32,8 +32,8 @@ TCourierEventBus 主要包含以下功能和特点：
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 public class TCourierEventBus implements TCourierEventBusInterface {
     private final String TAG = "TCourierEventBus";
-    ///private final String DEFAULT_EVENT_METHOD_NAME = "onCourierEvent";
-    ///private final ObjectList EventTypeList = new ObjectList();
+    /// private final String DEFAULT_EVENT_METHOD_NAME = "onCourierEvent";
+    /// private final ObjectList EventTypeList = new ObjectList();
     //private InvokeInterface invokeInterface = null;
     private final ObjectList mInvokerList = new ObjectList();
     //private final ArrayList<Object> mCourierEventsQueueA = new ArrayList<Object>();
@@ -70,7 +70,7 @@ public class TCourierEventBus implements TCourierEventBusInterface {
         ///mKeepDoing = true;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //注册默认接口
     //@Deprecated
     public void registerEventObserver(@NotNull String tag, @NotNull TCourierEventListener courierEventListener) {
@@ -83,7 +83,7 @@ public class TCourierEventBus implements TCourierEventBusInterface {
         ///printAllEventListener();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //观察订阅
     public void registerEventObserver(@NotNull Object context) {
         ///if (InvokerList.containsTag(tag)) return;
@@ -105,7 +105,8 @@ public class TCourierEventBus implements TCourierEventBusInterface {
                 mInvokerList.removeObjectsLike(tag);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            MMLog.e(TAG, e.toString());
         }
     }
 
@@ -115,7 +116,8 @@ public class TCourierEventBus implements TCourierEventBusInterface {
                 mInvokerList.removeObjectsLike(courierEventListener.getClass().getName());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            MMLog.e(TAG, e.toString());
         }
     }
 
@@ -123,10 +125,12 @@ public class TCourierEventBus implements TCourierEventBusInterface {
         return mInvokerList;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void post(Object eventCourier) {
-        eventQueue.offer(eventCourier);
+        if (!eventQueue.offer(eventCourier)) {
+            MMLog.e(TAG, "Could not add event to eventQueue, it might be full.");
+        }
     }
 
     public void post(EventCourierInterface eventCourier) {
@@ -134,11 +138,15 @@ public class TCourierEventBus implements TCourierEventBusInterface {
     }
 
     public void postMain(Object eventCourier) {
-        mainQueue.offer(eventCourier);
+        if (!eventQueue.offer(eventCourier)) {
+            MMLog.e(TAG, "Could not add event to eventQueue, it might be full.");
+        }
     }
 
     public void postMain(EventCourierInterface eventCourier) {
-        mainQueue.offer(eventCourier);
+        if (!eventQueue.offer(eventCourier)) {
+            MMLog.e(TAG, "Could not add event to eventQueue, it might be full.");
+        }
     }
 
     public void postDelay(Object eventCourier, long millis) {
@@ -151,7 +159,10 @@ public class TCourierEventBus implements TCourierEventBusInterface {
         });
     }
 
-    // ================= 核心分发循环 =================
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  核心分发循环
     private void dispatchLoop() {
         try {
             while (isRunning && !Thread.currentThread().isInterrupted()) {
@@ -174,7 +185,10 @@ public class TCourierEventBus implements TCourierEventBusInterface {
                             break;
                         case MAIN:
                         case MAIN_ORDERED:
-                            mainQueue.offer(evt);
+                            if (!mainQueue.offer(evt)) {
+                                MMLog.e(TAG, "Could not add event to mainQueue, it might be full.");
+                            }
+                            //mainQueue.offer(evt);
                             break;
                         case POSTING:
                         case ASYNC:
@@ -189,6 +203,9 @@ public class TCourierEventBus implements TCourierEventBusInterface {
         }
     }
 
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 主队列事件循环
     private void dispatchMainLoop() {
         try {
@@ -206,9 +223,9 @@ public class TCourierEventBus implements TCourierEventBusInterface {
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //查找订阅的方法
     private void findCourierEventTypeSubscriber(String tag, Object courierEventListener) {
         Method[] methods = courierEventListener.getClass().getMethods();
@@ -257,15 +274,17 @@ public class TCourierEventBus implements TCourierEventBusInterface {
                     ((TCourierEventListener) context).onCourierEvent((EventCourierInterface) event);//call 默认接口onCourierEvent(event);
                 }
             }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            ///e.printStackTrace();
-            ///MMLog.e(TAG, tCourierEventListenerBundle.toToString());
-            ///MMLog.e(TAG,  event.getClass().getSimpleName()+","+e.toString());
+        } catch (IllegalAccessException e) {
+            MMLog.e(TAG, "Failed to invoke subscriber for event " + event.getClass().getSimpleName() + e);
+        } catch (InvocationTargetException e) {
+            // 获取由订阅者方法实际抛出的原始异常
+            Throwable cause = e.getCause();
+            MMLog.e(TAG, "Subscriber threw an exception for event " + event.getClass().getSimpleName() + cause);
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     static class TCourierEventListenerBundle {
         private final Object courierEventListener;
         private final Method method;
@@ -319,7 +338,7 @@ public class TCourierEventBus implements TCourierEventBusInterface {
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @SuppressWarnings("ClassExplicitlyAnnotation")
     static class defaultSubscriber implements TCourierSubscribe {
 
@@ -364,7 +383,7 @@ public class TCourierEventBus implements TCourierEventBusInterface {
 
     public String getEventListeners() {
         StringBuilder stringBuffer = new StringBuilder();
-        String line = System.getProperty("line.separator");
+        String line = System.lineSeparator();
         for (Object obj : mInvokerList.getAllObject()) {
             TCourierEventListenerBundle listenerBundle = (TCourierEventListenerBundle) obj;
             if (listenerBundle.getMethod() != null)
