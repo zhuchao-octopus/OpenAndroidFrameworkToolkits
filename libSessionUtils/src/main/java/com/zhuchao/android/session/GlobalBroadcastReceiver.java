@@ -81,7 +81,8 @@ public class GlobalBroadcastReceiver extends BroadcastReceiver {
 
     public synchronized static void unregisterGlobalBroadcastReceiver(Context context) {
         try {
-            if (mGlobalBroadcastReceiver != null) context.unregisterReceiver(mGlobalBroadcastReceiver);
+            if (mGlobalBroadcastReceiver != null)
+                context.unregisterReceiver(mGlobalBroadcastReceiver);
             mGlobalBroadcastReceiver = null;
         } catch (Exception e) {
             //throw new RuntimeException(e);
